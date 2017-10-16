@@ -7,7 +7,7 @@ const app = express();
 const port = 3000;
 //Body parser middleware
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({ extended: false }));
 
 //get rid of the warning
 mongoose.Promise = global.Promise;
@@ -15,15 +15,15 @@ mongoose.Promise = global.Promise;
 //Connect to mongoose
 mongoose.connect('mongodb://localhost/vididea-dev', { useMongoClient: true })
 
-.then(()=> console.log("MongoDB connected..."))
-.catch(err => console.log(err));
+  .then(() => console.log("MongoDB connected..."))
+  .catch(err => console.log(err));
 
 //Load Idea Models
 require('./models/Idea');
 const Idea = mongoose.model("ideas")
 
 //Middleware for handlebars
-app.engine('handlebars', exphbs({defaultLayout: 'main'}));
+app.engine('handlebars', exphbs({ defaultLayout: 'main' }));
 app.set('view engine', 'handlebars');
 
 // Index Route
@@ -44,12 +44,27 @@ app.get('/ideas/add', (req, res) => {
 });
 
 //Process the form
-app.post('/ideas', (req, res)=>{
-  res.send(`<h2>${req.body.title}</h2>`);
+app.post('/ideas', (req, res) => {
+  let error = [];
+  if (!req.body.title) {
+    error.push({ text: "Please insert the title" });
+  } if (!req.body.details) {
+    error.push({ text: "Please insert the details" });
+  }
+  if (error.length > 0) {
+    res.render("ideas/add", {
+      error: error,
+      title: req.body.tile,
+      details: req.body.details
+    });
+  }
+  else{
+  res.send("passed");
+  }
 });
 
 
 
-app.listen(port, () =>{
+app.listen(port, () => {
   console.log(`Server started on port ${port}`);
 });
