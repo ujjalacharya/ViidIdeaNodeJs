@@ -43,6 +43,19 @@ app.get('/ideas/add', (req, res) => {
   res.render('ideas/add');
 });
 
+//Idea Route
+app.get('/ideas', (req, res) => {
+  Idea.find({})                       //Idea.find({}, function(err, ideas)){
+    .sort({ date: "desc" })              // if(err) console.log(err);
+    .then(ideas => {                 //else res.render("/ideas/index", {ideas: ideas});
+      res.render("ideas/index", {     //} });
+        ideas: ideas
+      });
+    });
+});
+
+
+
 //Process the form
 app.post('/ideas', (req, res) => {
   let error = [];
@@ -58,13 +71,25 @@ app.post('/ideas', (req, res) => {
       details: req.body.details
     });
   }
-  else{
-  res.send("passed");
+  else {
+    const newUser = {
+      title: req.body.title,
+      details: req.body.details
+    }
+
+    new Idea(newUser)
+      .save()
+      .then(idea => {
+        res.redirect('/ideas');
+
+      });
   }
 });
 
 
 
-app.listen(port, () => {
-  console.log(`Server started on port ${port}`);
-});
+
+
+  app.listen(port, () => {
+    console.log(`Server started on port ${port}`);
+  });
